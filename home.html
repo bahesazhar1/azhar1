@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بيئة تنمية مهارات التحول الرقمي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f4f7fa; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* ================= الشريط العلوي (أبيض) ================= */
+        .top-header { background-color: #ffffff; color: #1a2b4c; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative; z-index: 1002; }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { font-size: 24px; cursor: pointer; transition: 0.2s; color: #1a2b4c; }
+        .menu-btn:hover { color: #5b8ee5; }
+        .brand-title { font-weight: 900; font-size: 22px; letter-spacing: 0.5px; }
+        .brand-title span { background: #eef2f5; color: #5b8ee5; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; margin-right: 5px; }
+        
+        .logout-btn { background-color: #e74c3c; color: white; border: none; padding: 8px 20px; border-radius: 6px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.3s; display: flex; align-items: center; gap: 8px; }
+        .logout-btn:hover { background-color: #c0392b; transform: translateY(-1px); }
+
+        /* ================= شريط القوائم الأساسي (كحلي) ================= */
+        .main-nav { background-color: #1a2b4c; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 0 20px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; }
+        .nav-list { list-style: none; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; padding: 5px 0; }
+        .nav-list > li { position: relative; }
+        .nav-list > li > a { display: flex; align-items: center; gap: 8px; padding: 14px 18px; color: white; text-decoration: none; font-weight: 700; font-size: 15px; cursor: pointer; border-radius: 8px; transition: all 0.3s ease; }
+        .nav-list > li > a i { color: #5b8ee5; font-size: 16px; }
+        .nav-list > li > a:hover, .nav-list > li > a.active { background-color: #2980b9; transform: translateY(-2px); }
+        .nav-list > li > a:hover i, .nav-list > li > a.active i { color: white; }
+
+        .dropdown { position: absolute; top: 100%; right: 0; background-color: white; min-width: 230px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border-radius: 8px; border-top: 4px solid #5b8ee5; display: none; flex-direction: column; overflow: hidden; z-index: 1001; margin-top: 5px; }
+        .has-dropdown:hover .dropdown { display: flex; }
+        .dropdown a { padding: 12px 20px; color: #1a2b4c; text-decoration: none; font-size: 14px; font-weight: 700; border-bottom: 1px solid #f1f1f1; transition: 0.2s; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .dropdown a i { color: #5b8ee5; }
+        .dropdown a:hover { background-color: #f4f7fa; color: #5b8ee5; padding-right: 25px; }
+
+        /* ================= القوائم الجانبية ================= */
+        .sidebar { position: fixed; top: 0; right: -320px; width: 300px; height: 100vh; background: white; box-shadow: -5px 0 25px rgba(0,0,0,0.1); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1005; padding-top: 20px; display: flex; flex-direction: column; }
+        .sidebar.active { right: 0; }
+        
+        .module-sidebar { position: fixed; top: 0; right: -380px; width: 350px; height: 100vh; background: white; box-shadow: -5px 0 25px rgba(0,0,0,0.15); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1006; display: flex; flex-direction: column; }
+        .module-sidebar.active { right: 0; }
+        
+        .sidebar-header { padding: 20px 25px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background-color: #f8faff; }
+        .sidebar-header h3 { color: #1a2b4c; font-size: 18px; font-weight: 900; }
+        .close-sidebar { font-size: 22px; color: #95a5a6; cursor: pointer; transition: 0.2s; }
+        .close-sidebar:hover { color: #e74c3c; transform: rotate(90deg); }
+        
+        .sidebar ul { list-style: none; flex: 1; margin-top: 10px; }
+        .sidebar ul li a { display: flex; align-items: center; gap: 15px; padding: 16px 25px; color: #34495e; text-decoration: none; font-weight: 600; font-size: 15px; border-left: 4px solid transparent; transition: 0.2s; cursor: pointer; }
+        .sidebar ul li a i { color: #5b8ee5; font-size: 18px; width: 20px; text-align: center; }
+        .sidebar ul li a:hover { background-color: #f4f7fa; color: #5b8ee5; border-left-color: #5b8ee5; }
+
+        /* زراير الخطوات جوه الموديول */
+        .module-actions { padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+        .mod-btn { background: #f8faff; border: 2px solid #eef2f5; color: #1a2b4c; padding: 15px; border-radius: 10px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 15px; text-align: right; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .mod-btn i { color: #5b8ee5; font-size: 18px; width: 25px; text-align: center; }
+        .mod-btn:hover { background: #5b8ee5; border-color: #5b8ee5; color: white; transform: translateX(-5px); }
+        .mod-btn:hover i { color: white; }
+        
+        /* تأثير القفل للخطوات والموديولات */
+        .mod-btn.locked { opacity: 0.5; pointer-events: none; background: #f4f7fa; border-color: #ddd; color: #95a5a6; }
+        .mod-btn.locked i { color: #95a5a6; }
+        .mod-btn.completed { border-color: #2ecc71; }
+        .mod-btn.completed i { color: #2ecc71; }
+
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1004; display: none; backdrop-filter: blur(2px); }
+        .overlay.active { display: block; }
+
+        /* ================= منطقة المحتوى ================= */
+        .main-content { flex: 1; padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        
+        /* 1. الغلاف الفخم (Cover) */
+        .cover-view { text-align: center; animation: fadeIn 0.5s; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+        .cover-view img { max-width: 100%; max-height: calc(100vh - 180px); object-fit: contain; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+
+        /* 2. شبكة الموديولات */
+        .modules-grid { display: none; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 20px; animation: fadeIn 0.5s; }
+        .module-card { background: white; border-radius: 16px; padding: 35px 25px; display: flex; align-items: center; gap: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; border: 1px solid #eef2f5; }
+        .module-card::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 5px; background: #5b8ee5; transform: scaleX(0); transition: transform 0.3s ease; transform-origin: left; }
+        .module-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(26, 43, 76, 0.1); border-color: #d1e0fc; }
+        .module-card:hover::after { transform: scaleX(1); }
+        
+        /* ستايل الموديول المقفول */
+        .module-card.locked { opacity: 0.6; filter: grayscale(100%); cursor: not-allowed; pointer-events: none; }
+        .module-card.locked::after { display: none; }
+
+        .unified-icon { width: 70px; height: 70px; background-color: #f4f7fa; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: #5b8ee5; flex-shrink: 0; transition: 0.3s; }
+        .module-card:hover .unified-icon { background-color: #5b8ee5; color: white; }
+        .module-card.locked .unified-icon { color: #95a5a6; }
+
+        .module-info { text-align: right; }
+        .module-info h3 { color: #1a2b4c; font-size: 22px; font-weight: 900; margin-bottom: 5px; }
+        .module-info p { color: #7f8c8d; font-size: 14px; font-weight: 600; }
+
+        /* 3. شاشة المحتوى الداخلية للخطوات */
+        .step-content-view { display: none; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 5px 25px rgba(0,0,0,0.05); text-align: center; animation: fadeIn 0.4s; min-height: 400px; }
+        .step-content-view h2 { color: #1a2b4c; font-size: 28px; font-weight: 900; margin-bottom: 20px; border-bottom: 2px solid #f0f4f8; padding-bottom: 15px; }
+        .step-content-view .content-body { font-size: 18px; color: #555; line-height: 1.8; margin-bottom: 40px; text-align: right; }
+        .complete-btn { background: #2ecc71; color: white; border: none; padding: 15px 40px; font-size: 18px; font-weight: 800; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: 'Cairo', sans-serif; display: inline-flex; align-items: center; gap: 10px; }
+        .complete-btn:hover { background: #27ae60; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); }
+
+        /* ================= شاشة النتيجة التفصيلية ================= */
+        .result-dashboard { display: none; animation: fadeIn 0.5s; width: 100%; max-width: 900px; margin: 0 auto; }
+        .dashboard-layout { display: flex; gap: 30px; flex-wrap: wrap; margin-top: 30px; }
+        .stats-container { flex: 1; min-width: 300px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #eee; }
+        .stat-card h4 { font-size: 14px; margin-bottom: 10px; color: #7f8c8d; }
+        .stat-card .value { font-size: 28px; font-weight: 900; }
+        .stat-card.correct .value { color: #2ecc71; }
+        .stat-card.wrong .value { color: #e74c3c; }
+        .stat-card.perc .value { color: #2980b9; }
+
+        .chart-container { flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #eee; display: flex; align-items: flex-end; justify-content: center; gap: 40px; height: 250px; position: relative; padding-bottom: 40px; }
+        .chart-container::before { content: ""; position: absolute; top: 20px; left: 20px; right: 20px; bottom: 40px; background-image: linear-gradient(to bottom, #f0f0f0 1px, transparent 1px); background-size: 100% 20%; z-index: 0; }
+        .bar-wrapper { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 60px; }
+        .bar { width: 100%; border-radius: 5px 5px 0 0; transition: height 1s cubic-bezier(0.4, 0, 0.2, 1); height: 0; display: flex; justify-content: center; align-items: flex-start; padding-top: 10px; color: white; font-weight: bold; }
+        .bar.green { background: linear-gradient(to top, #27ae60, #2ecc71); }
+        .bar.red { background: linear-gradient(to top, #c0392b, #e74c3c); }
+        .bar-label { position: absolute; bottom: -30px; font-weight: 700; color: #34495e; font-size: 14px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ================= الفوتر (كحلي) ================= */
+        .footer { text-align: center; padding: 25px; background-color: #1a2b4c; color: white; font-size: 14px; font-weight: 700; margin-top: auto; }
+    </style>
+</head>
+<body>
+
+    <script>
+        let currentUser = localStorage.getItem("currentUser");
+        if (!currentUser) window.location.href = "index.html";
+        else if (localStorage.getItem(currentUser + "_preTestDone") !== "true") window.location.href = "pre-test.html";
+        else if (localStorage.getItem(currentUser + "_surveyDone") !== "true") window.location.href = "survey.html";
+    </script>
+
+    <div class="top-header">
+        <div class="header-right">
+            <div class="menu-btn" onclick="toggleSidebar('userSidebar')"><i class="fa-solid fa-bars"></i></div>
+            <div class="brand-title">بيئة تنمية مهارات التحول الرقمي <span>Beta</span></div>
+        </div>
+        <button class="logout-btn" onclick="logout()">تسجيل خروج <i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+    </div>
+
+    <nav class="main-nav">
+        <ul class="nav-list">
+            <li><a onclick="showView('cover')" class="active" id="nav-home"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+            <li><a onclick="alert('دليل الطالب قيد الإنشاء')"><i class="fa-solid fa-book"></i> دليل الطالب</a></li>
+            <li><a onclick="alert('الأهداف العامة قيد الإنشاء')"><i class="fa-solid fa-bullseye"></i> الأهداف العامة</a></li>
+            
+            <li class="has-dropdown">
+                <a><i class="fa-solid fa-file-pen"></i> أدوات القياس القبلي ▼</a>
+                <div class="dropdown">
+                    <a onclick="showResultDashboard()"><i class="fa-solid fa-square-check"></i> الاختبار التحصيلي</a>
+                    <a onclick="alert('مقياس التقبل التكنولوجي - تم حفظه مسبقاً')"><i class="fa-solid fa-list-check"></i> مقياس التقبل التكنولوجي</a>
+                </div>
+            </li>
+            
+            <li><a onclick="showView('modules')" id="nav-modules"><i class="fa-solid fa-laptop-file"></i> المحتوى التعليمي</a></li>
+            
+            <li class="has-dropdown">
+                <a><i class="fa-solid fa-chart-simple"></i> أدوات القياس البعدي ▼</a>
+                <div class="dropdown">
+                    <a onclick="alert('مغلق حتى إتمام الموديولات')"><i class="fa-solid fa-lock"></i> الاختبار التحصيلي</a>
+                    <a onclick="alert('مغلق حتى إتمام الموديولات')"><i class="fa-solid fa-lock"></i> مقياس التقبل التكنولوجي</a>
+                </div>
+            </li>
+            <li><a onclick="alert('صفحة تواصل معنا - قيد التجهيز')"><i class="fa-solid fa-headset"></i> تواصل معنا</a></li>
+        </ul>
+    </nav>
+
+    <div class="overlay" id="overlay" onclick="closeAllSidebars()"></div>
+
+    <div class="sidebar" id="userSidebar">
+        <div class="sidebar-header">
+            <div>
+                <h3>مرحباً، <span id="studentName"></span></h3>
+                <p style="color:#7f8c8d; font-size:12px; margin-top:5px; font-weight:700;">طالب بكلية التربية</p>
+            </div>
+            <div class="close-sidebar" onclick="closeAllSidebars()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <ul>
+            <li><a onclick="alert('قيد التجهيز'); closeAllSidebars();"><i class="fa-solid fa-user-graduate"></i> لوحة الطالب</a></li>
+            <li><a onclick="alert('قيد التجهيز'); closeAllSidebars();"><i class="fa-solid fa-circle-info"></i> عن البيئة</a></li>
+            <li><a onclick="alert('قيد التجهيز'); closeAllSidebars();"><i class="fa-solid fa-link"></i> روابط تهمك</a></li>
+            <li><a onclick="alert('قيد التجهيز'); closeAllSidebars();"><i class="fa-regular fa-comments"></i> الدعم والمساعدة</a></li>
+        </ul>
+    </div>
+
+    <div class="module-sidebar" id="moduleSidebar">
+        <div class="sidebar-header">
+            <h3 id="moduleTitleDisplay">عنوان الموديول</h3>
+            <div class="close-sidebar" onclick="closeAllSidebars()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="module-actions" id="moduleStepsContainer">
+            </div>
+    </div>
+
+    <div class="main-content">
+        
+        <div id="coverView" class="cover-view">
+            <img src="cover.jpg" alt="غلاف الرسالة">
+        </div>
+
+        <div id="modulesView" class="modules-grid">
+            <div class="module-card" id="modCard1">
+                <div class="unified-icon" id="modIcon1"><i class="fa-regular fa-folder-open"></i></div>
+                <div class="module-info"><h3>الموديول الأول</h3><p>مقدمة في التحول الرقمي</p></div>
+            </div>
+            <div class="module-card locked" id="modCard2">
+                <div class="unified-icon" id="modIcon2"><i class="fa-solid fa-lock"></i></div>
+                <div class="module-info"><h3>الموديول الثاني</h3><p>أدوات الحوسبة السحابية</p></div>
+            </div>
+            <div class="module-card locked" id="modCard3">
+                <div class="unified-icon" id="modIcon3"><i class="fa-solid fa-lock"></i></div>
+                <div class="module-info"><h3>الموديول الثالث</h3><p>تصميم المحتوى الإلكتروني</p></div>
+            </div>
+            <div class="module-card locked" id="modCard4">
+                <div class="unified-icon" id="modIcon4"><i class="fa-solid fa-lock"></i></div>
+                <div class="module-info"><h3>الموديول الرابع</h3><p>التقييم والاختبارات الرقمية</p></div>
+            </div>
+            <div class="module-card locked" id="modCard5">
+                <div class="unified-icon" id="modIcon5"><i class="fa-solid fa-lock"></i></div>
+                <div class="module-info"><h3>الموديول الخامس</h3><p>إدارة الفصول الافتراضية</p></div>
+            </div>
+            <div class="module-card locked" id="modCard6">
+                <div class="unified-icon" id="modIcon6"><i class="fa-solid fa-lock"></i></div>
+                <div class="module-info"><h3>الموديول السادس</h3><p>تطبيقات الذكاء الاصطناعي</p></div>
+            </div>
+        </div>
+
+        <div id="stepContentView" class="step-content-view">
+            <h2 id="stepContentTitle">عنوان الخطوة</h2>
+            <div class="content-body" id="stepContentBody">
+                </div>
+            <button class="complete-btn" id="completeBtn" onclick="confirmStepCompletion()"></button>
+        </div>
+
+        <div id="resultView" class="result-dashboard">
+            <div style="text-align:center;">
+                <div class="icon-circle" style="color:#2ecc71; margin: 0 auto 15px; width:80px; height:80px; font-size:40px; border-radius:50%; background:white; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 25px rgba(46,204,113,0.2);"><i class="fa-solid fa-square-check"></i></div>
+                <h1 style="color:#1a2b4c; font-weight:900;">تقرير نتيجة الاختبار القبلي</h1>
+            </div>
+            <div class="dashboard-layout">
+                <div class="stats-container">
+                    <div class="stat-card correct"><h4>إجابات صحيحة</h4><div class="value" id="homeResCorrect">0</div></div>
+                    <div class="stat-card wrong"><h4>إجابات خاطئة</h4><div class="value" id="homeResWrong">0</div></div>
+                    <div class="stat-card perc" style="grid-column: span 2;"><h4>النسبة المئوية</h4><div class="value" id="homeResPerc">0%</div></div>
+                </div>
+                <div class="chart-container">
+                    <div class="bar-wrapper"><div class="bar green" id="homeBarCorrect"></div><div class="bar-label">صحيحة</div></div>
+                    <div class="bar-wrapper"><div class="bar red" id="homeBarWrong"></div><div class="bar-label">خاطئة</div></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">جميع الحقوق محفوظة للباحث © 2026</div>
+
+    <script>
+        document.getElementById("studentName").innerText = currentUser;
+
+        // ================= محرك التسلسل الذكي (Sequential Engine) =================
+        
+        // استدعاء مستوى تقدم الطالب من الذاكرة (لو أول مرة هيكون موديول 1، خطوة 1)
+        let unlockedModule = parseInt(localStorage.getItem(currentUser + "_unlockedModule")) || 1;
+        let unlockedStep = parseInt(localStorage.getItem(currentUser + "_unlockedStep")) || 1;
+        
+        let currentOpenModule = 1;
+        let currentlyViewingStep = 1;
+
+        const stepsData = [
+            { name: "مبررات دراسة الموديول", icon: "fa-lightbulb" },
+            { name: "أهداف دراسة الموديول", icon: "fa-bullseye" },
+            { name: "الاختبار القبلي للموديول", icon: "fa-file-pen" },
+            { name: "المهمة الأدائية القبلية", icon: "fa-puzzle-piece" },
+            { name: "محتوى الموديول", icon: "fa-book-open" },
+            { name: "الاختبار البعدي للموديول", icon: "fa-chart-column" },
+            { name: "المهمة الأدائية البعدية", icon: "fa-toolbox" }
+        ];
+
+        // 1. تحديث شكل الموديولات الستة (فتح وقفول)
+        function updateModulesUI() {
+            for(let i = 1; i <= 6; i++) {
+                let card = document.getElementById("modCard" + i);
+                let icon = document.getElementById("modIcon" + i);
+                if(i <= unlockedModule) {
+                    card.classList.remove("locked");
+                    card.setAttribute("onclick", `openModuleMenu(${i})`);
+                    icon.innerHTML = '<i class="fa-regular fa-folder-open"></i>';
+                } else {
+                    card.classList.add("locked");
+                    card.removeAttribute("onclick");
+                    icon.innerHTML = '<i class="fa-solid fa-lock"></i>';
+                }
+            }
+        }
+
+        // 2. فتح القائمة الجانبية للموديول ورسم زراير الخطوات
+        function openModuleMenu(modNum) {
+            currentOpenModule = modNum;
+            document.getElementById("moduleTitleDisplay").innerText = "الموديول رقم (" + modNum + ")";
+            
+            let container = document.getElementById("moduleStepsContainer");
+            container.innerHTML = ""; // تفريغ القائمة القديمة
+
+            // لو بيفتح موديول قديم خلصه، نفتحله كل الخطوات (7). لو بيفتح الموديول الحالي، نفتحله لحد الخطوة اللي وصلها
+            let stepsUnlockedForThisMod = (currentOpenModule < unlockedModule) ? 7 : unlockedStep;
+
+            stepsData.forEach((step, index) => {
+                let stepNum = index + 1;
+                let btn = document.createElement("button");
+                
+                if (stepNum <= stepsUnlockedForThisMod) {
+                    // خطوة مفتوحة
+                    btn.className = "mod-btn";
+                    btn.innerHTML = `<i class="fa-solid ${step.icon}"></i> ${step.name}`;
+                    btn.onclick = () => openStepContent(stepNum);
+                    
+                    // تلوين الخطوات المكتملة بالأخضر
+                    if (stepNum < stepsUnlockedForThisMod || currentOpenModule < unlockedModule) {
+                        btn.classList.add("completed");
+                        btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${step.name}`;
+                    }
+                } else {
+                    // خطوة مقفولة
+                    btn.className = "mod-btn locked";
+                    btn.innerHTML = `<i class="fa-solid fa-lock"></i> ${step.name}`;
+                }
+                
+                container.appendChild(btn);
+            });
+
+            toggleSidebar('moduleSidebar');
+        }
+
+        // 3. فتح شاشة قراءة المحتوى الداخلي للخطوة
+        function openStepContent(stepNum) {
+            closeAllSidebars();
+            hideAllViews();
+            
+            let view = document.getElementById("stepContentView");
+            view.style.display = "block";
+            currentlyViewingStep = stepNum;
+
+            let stepName = stepsData[stepNum - 1].name;
+            document.getElementById("stepContentTitle").innerText = stepName;
+            
+            // محتوى تجريبي لحد ما ترفع المادة العلمية
+            document.getElementById("stepContentBody").innerHTML = `
+                <p style="font-size:20px; font-weight:700;">عزيزي الطالب، أنت الآن في قسم: <span style="color:#5b8ee5;">${stepName}</span></p>
+                <p style="margin-top:20px;">يرجى قراءة ومراجعة المحتوى بعناية. عند الانتهاء، اضغط على زر التأكيد بالأسفل للانتقال للخطوة التالية.</p>
+                <div style="background:#f8faff; padding:30px; border-radius:12px; margin-top:30px; border:1px dashed #5b8ee5;">
+                    (مكان مخصص لإضافة النصوص أو الفيديوهات الخاصة بالدكتور إسلام لاحقاً)
+                </div>
+            `;
+
+            let btn = document.getElementById("completeBtn");
+            
+            // الزرار بيظهر بس لو دي أقصى خطوة هو واصلها حالياً
+            if (currentOpenModule === unlockedModule && stepNum === unlockedStep) {
+                btn.style.display = "inline-flex";
+                if (stepNum === 7) {
+                    btn.innerHTML = "✅ إتمام الموديول بالكامل والانتقال للموديول التالي ➔";
+                } else {
+                    btn.innerHTML = "✅ إتمام قراءة المحتوى والانتقال للخطوة التالية ➔";
+                }
+            } else {
+                btn.style.display = "none"; // خطوة تم إنجازها مسبقاً
+            }
+        }
+
+        // 4. تأكيد إنهاء الخطوة وفتح القفل اللي بعدها
+        function confirmStepCompletion() {
+            if (unlockedStep < 7) {
+                unlockedStep++;
+                localStorage.setItem(currentUser + "_unlockedStep", unlockedStep);
+                alert("ممتاز! تم إتمام الخطوة بنجاح.. تم فك قفل الخطوة التالية.");
+                openModuleMenu(currentOpenModule); // نرجع نفتحله القائمة عشان يشوف الجديد
+            } else {
+                // خلص الخطوة السابعة (المهمة البعدية)! نفتح الموديول اللي بعده
+                if (unlockedModule < 6) {
+                    unlockedModule++;
+                    unlockedStep = 1; // تصفير الخطوات للموديول الجديد
+                    localStorage.setItem(currentUser + "_unlockedModule", unlockedModule);
+                    localStorage.setItem(currentUser + "_unlockedStep", unlockedStep);
+                    alert("🎉 رائع جداً! أتممت الموديول بنجاح. تم فك قفل الموديول التالي.");
+                    updateModulesUI();
+                    showView('modules'); // نرجعه لشبكة الموديولات
+                } else {
+                    alert("🎓 ألف مبروك! لقد أتممت دراسة كافة الموديولات بنجاح مبهر.");
+                    localStorage.setItem(currentUser + "_allCompleted", "true");
+                    showView('cover');
+                }
+            }
+        }
+
+        // تشغيل التحديث أول ما الصفحة تحمل
+        updateModulesUI();
+
+        // ================= الوظائف الأساسية للصفحة =================
+
+        function toggleSidebar(id) {
+            closeAllSidebars();
+            document.getElementById(id).classList.add("active");
+            document.getElementById("overlay").classList.add("active");
+        }
+
+        function closeAllSidebars() {
+            document.getElementById("userSidebar").classList.remove("active");
+            document.getElementById("moduleSidebar").classList.remove("active");
+            document.getElementById("overlay").classList.remove("active");
+        }
+
+        function hideAllViews() {
+            document.getElementById("coverView").style.display = "none";
+            document.getElementById("modulesView").style.display = "none";
+            document.getElementById("resultView").style.display = "none";
+            document.getElementById("stepContentView").style.display = "none";
+            
+            document.getElementById("nav-home").classList.remove("active");
+            document.getElementById("nav-modules").classList.remove("active");
+        }
+
+        function showView(view) {
+            hideAllViews();
+            if (view === 'cover') {
+                document.getElementById("coverView").style.display = "flex";
+                document.getElementById("nav-home").classList.add("active");
+            } else if (view === 'modules') {
+                document.getElementById("modulesView").style.display = "grid";
+                document.getElementById("nav-modules").classList.add("active");
+            }
+        }
+
+        function showResultDashboard() {
+            hideAllViews();
+            document.getElementById("resultView").style.display = "block";
+            
+            let scorePerc = parseInt(localStorage.getItem(currentUser + "_preTestScore")) || 0;
+            let correct = parseInt(localStorage.getItem(currentUser + "_preTestCorrect")) || 0;
+            let wrong = parseInt(localStorage.getItem(currentUser + "_preTestWrong")) || 0;
+
+            document.getElementById("homeResCorrect").innerText = correct;
+            document.getElementById("homeResWrong").innerText = wrong;
+            document.getElementById("homeResPerc").innerText = scorePerc + "%";
+
+            setTimeout(() => {
+                document.getElementById("homeBarCorrect").style.height = scorePerc + "%";
+                document.getElementById("homeBarCorrect").innerText = scorePerc + "%";
+                let wrongPerc = 100 - scorePerc;
+                document.getElementById("homeBarWrong").style.height = wrongPerc + "%";
+                document.getElementById("homeBarWrong").innerText = wrongPerc + "%";
+            }, 100);
+        }
+
+        function logout() {
+            if(confirm("هل تريد بالتأكيد تسجيل الخروج؟")) {
+                localStorage.removeItem("currentUser");
+                window.location.href = "index.html";
+            }
+        }
+    </script>
+</body>
+</html>
+
